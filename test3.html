@@ -25,40 +25,40 @@
 </main>
 </body>
 <script type="module">
-  const mod=import('./paq.mjs');
-  const divs=[...document.querySelectorAll('main>div')];
-  divs[0].textContent='Fetching data...';
-  const original=new Uint8Array(await(await fetch('./paq.wasm.br')).arrayBuffer());
-  divs[0].textContent+=`done (${original.byteLength})`;
-  divs[1].textContent='Encrypting data...';
-  const iv=crypto.getRandomValues(new Uint8Array(12));
-  const key=await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt']);
-  const encrypted=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,original));
-  divs[1].textContent+='done';
-  divs[2].textContent='Initializing compressor... ';
-  const {paq,unpaq}=await mod;
-  divs[2].textContent+='done';
-  divs[3].textContent='Compressing... ';
-  const compressed=await paq(encrypted);
-  divs[3].textContent+=`done (${compressed.byteLength} B)`;
-  divs[4].textContent='Decompressing... ';
-  const decompressed=await unpaq(compressed);
-  divs[4].textContent+=`done (${decompressed.byteLength} B)`;
-  divs[5].textContent='Decrypting... ';
-  const decrypted=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv},key,decompressed));
-  divs[5].textContent+=`done`;
-  divs[6].textContent='Comparing... ';
-  const len=decrypted.byteLength;
-  let same=len===original.byteLength;
-  if(same){
-    for(let i=0;i<len;++i){
-      if(decrypted[i]!==original[i]){
-        console.log(i);
-        same=false;
-        break;
-      }
+const mod=import('./paq.mjs');
+const divs=[...document.querySelectorAll('main>div')];
+divs[0].textContent='Fetching data...';
+const original=new Uint8Array(await(await fetch('./paq.wasm.br')).arrayBuffer());
+divs[0].textContent+=`done (${original.byteLength})`;
+divs[1].textContent='Encrypting data...';
+const iv=crypto.getRandomValues(new Uint8Array(12));
+const key=await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt']);
+const encrypted=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,original));
+divs[1].textContent+='done';
+divs[2].textContent='Initializing compressor... ';
+const {paq,unpaq}=await mod;
+divs[2].textContent+='done';
+divs[3].textContent='Compressing... ';
+const compressed=await paq(encrypted);
+divs[3].textContent+=`done (${compressed.byteLength} B)`;
+divs[4].textContent='Decompressing... ';
+const decompressed=await unpaq(compressed);
+divs[4].textContent+=`done (${decompressed.byteLength} B)`;
+divs[5].textContent='Decrypting... ';
+const decrypted=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv},key,decompressed));
+divs[5].textContent+=`done`;
+divs[6].textContent='Comparing... ';
+const len=decrypted.byteLength;
+let same=len===original.byteLength;
+if(same){
+  for(let i=0;i<len;++i){
+    if(decrypted[i]!==original[i]){
+      console.log(i);
+      same=false;
+      break;
     }
   }
-  divs[6].innerHTML+=same?'<span class="ok">identical</span>':'<span class="ko">not identical</span>';
+}
+divs[6].innerHTML+=same?'<span class="ok">identical</span>':'<span class="ko">not identical</span>';
 </script>
 </html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compress</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{height:100%;font:4vmin monospace;background:#222;color:#eee}
+    body{min-height:100%;padding:1rem;display:grid;place-items:center}
+    main{text-align:center}
+    body.dragover::before{
+      content:'';
+      position:absolute;
+      inset:1rem;
+      background:rgba(200,200,200,.1);
+      border:2px solid rgba(200,200,200,.25);
+    }
+    main a{color:#adf}
+    main:not(:empty){font-size:67%}
+    main.ready:not(.busy):empty::before{
+      content:'Drag a file here';
+      font-style:italic;
+      opacity:.5;
+    }
+    main.busy::before{
+      content:'';
+      display:inline-block;
+      width:2rem;height:2rem;
+      border-radius:50%;
+      border:.1rem solid rgba(200,200,200,.5);
+      border-top-color:rgb(200,200,200);
+      animation:spin 1s ease-in-out infinite;
+      will-change:transform;
+    }
+    @keyframes spin{
+      to{transform:rotate(360deg)}
+    }
+  </style>
+</head>
+<body>
+<main></main>
+</body>
+<script type="module">
+const {paq}=await import('./paq.mjs');
+const main=document.querySelector('main');
+main.classList.add('ready');
+['dragenter','dragover','dragleave','drop'].forEach(it=>{
+  window.addEventListener(it,e=>{
+    e.preventDefault();e.stopPropagation();document.body.classList.remove('dragover');
+  },false);
+});
+const dragListener=e=>{
+  e.dataTransfer.dropEffect='copy';
+  document.body.classList.add('dragover');
+};
+window.addEventListener('dragover',dragListener,false);
+const read=file=>new Promise(r=>{
+  const reader=new FileReader();
+  reader.onloadend=()=>r(new Uint8Array(reader.result));
+  reader.readAsArrayBuffer(file);
+});
+const dropListener=async e=>{
+  main.textContent='';
+  main.classList.add('busy');
+  window.removeEventListener('dragover',dragListener);
+  window.removeEventListener('drop',dropListener);
+  const file=e.dataTransfer.files.item(0);
+  const compressed=await paq(await read(file));
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([compressed],{type:'octet/stream'}));
+  a.download=`${file.name}.paq`;
+  a.innerHTML=`${file.name}.paq`;
+  main.classList.remove('busy');
+  main.appendChild(a);
+  main.innerHTML+=`<br>(${compressed.byteLength} B)`;
+  window.addEventListener('dragover',dragListener,false);
+  window.addEventListener('drop',dropListener,false);
+};
+window.addEventListener('drop',dropListener,false);
+</script>
+</html>
