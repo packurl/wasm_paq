@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Test</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{height:100%;font:2vmin monospace;background:#222;color:#eee}
+body{min-height:100%;padding:1rem;display:grid;place-items:center}
+main{display:flex;flex-direction:column}
+main>div{height:2rem}
+.ok{color:green}
+.ko{color:red}
+</style>
+</head>
+<body>
+<main>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div></div>
+</main>
+</body>
+<script type="module">
+const mod=import('./paq.mjs');
+const divs=[...document.querySelectorAll('main>div')];
+divs[0].textContent='Fetching data...';
+const original=new Uint8Array(await(await fetch('./paq.wasm')).arrayBuffer());
+divs[0].textContent+=`done (${original.byteLength})`;
+divs[1].textContent='Initializing compressor... ';
+const {paq,unpaq}=await mod;
+divs[1].textContent+='done';
+divs[2].textContent='Compressing... ';
+const compressed=await paq(original);
+divs[2].textContent+=`done (${compressed.byteLength} B)`;
+divs[3].textContent='Decompressing... ';
+const decompressed=await unpaq(compressed);
+divs[3].textContent+=`done (${decompressed.byteLength} B)`;
+divs[4].textContent='Comparing... ';
+const len=decompressed.byteLength;
+let same=len===original.byteLength;
+if(same){
+  for(let i=0;i<len;++i){
+    if(decompressed[i]!==original[i]){
+      console.log(i);
+      same=false;
+      break;
+    }
+  }
+}
+divs[4].innerHTML+=same?'<span class="ok">identical</span>':'<span class="ko">not identical</span>';
+</script>
+</html>
