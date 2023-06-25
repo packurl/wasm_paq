@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Compress</title>
+<title>Decompress</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{height:100%;font:4vmin monospace;background:#222;color:#eee}
@@ -41,7 +41,7 @@ main.busy::before{
 <main></main>
 </body>
 <script type="module">
-const {paq}=await import('./paq.mjs');
+const {unpaq}=await import('./paq.mjs');
 const main=document.querySelector('main');
 main.classList.add('ready');
 ['dragenter','dragover','dragleave','drop'].forEach(it=>{
@@ -65,14 +65,14 @@ const dropListener=async e=>{
   window.removeEventListener('dragover',dragListener);
   window.removeEventListener('drop',dropListener);
   const file=e.dataTransfer.files.item(0);
-  const compressed=await paq(await read(file));
+  const decompressed=await unpaq(await read(file));
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([compressed],{type:'octet/stream'}));
-  a.download=`${file.name}.paq`;
-  a.innerHTML=`${file.name}.paq`;
+  a.href=URL.createObjectURL(new Blob([decompressed],{type:'octet/stream'}));
+  const name=file.name.replace(/[.]paq$/,'');
+  a.download=a.innerHTML=name;
   main.classList.remove('busy');
   main.appendChild(a);
-  main.innerHTML+=`<br>(${compressed.byteLength} B)`;
+  main.innerHTML+=`<br>(${decompressed.byteLength} B)`;
   window.addEventListener('dragover',dragListener,false);
   window.addEventListener('drop',dropListener,false);
 };
