@@ -1,8 +1,21 @@
 [package]
 name = "wasm_paq"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
-authors = ["programingjd"]
+authors = ["Jerome David <programingjd@gmail.com>"]
+categories = ["wasm", "compression"]
+description = "esm modules for paq compression and/or decompression, with sync and async (worker) versions"
+keywords = ["wasm", "paq", "esm"]
+license = "GPL-3.0-or-later"
+repository = "https://github.com/packurl/wasm_paq"
+include = [
+    "Cargo.toml", "src", "LICENSE", "README.md",
+    "paq.d.ts", "paq.mjs", "paq.wasm",
+    "paq_worker.d.ts", "paq_worker.mjs", "paq_worker_script.mjs",
+    "paq_worker_script.js", "paq_for_importScript.mjs",
+    "test1.html", "test2.html", "test3.html",
+    "compress.html", "decompress.html"
+]
 
 [lib]
 crate-type = ["cdylib","rlib"]
