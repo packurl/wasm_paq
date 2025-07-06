@@ -1,8 +1,8 @@
 [package]
-name = "paq"
+name = "wasm_paq"
 version = "0.3.0"
+edition = "2024"
 authors = ["programingjd"]
-edition = "2021"
 
 [lib]
 crate-type = ["cdylib","rlib"]
@@ -10,11 +10,22 @@ crate-type = ["cdylib","rlib"]
 [dependencies.wasm-bindgen]
 version = "0.2"
 
-[dependencies.mashi-core]
-version = "0.1"
-features=["encoder"]
-default-features=false
+[dev-dependencies.rand]
+version = "0.9"
 
 [profile.release]
 opt-level = "s"
-lto = true
+lto = "fat"
+codegen-units = 1
+
+#[profile.release]
+#opt-level = "z"
+#lto = "thin"
+#codegen-units = 1
+
+[profile.custom]
+inherits = "release"
+opt-level = "z"
+lto = "thin"
+codegen-units = 1
+#panic = "abort"

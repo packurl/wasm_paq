@@ -23,7 +23,7 @@ main>div{height:2rem}
 </main>
 </body>
 <script type="module">
-const mod=import('./paq.mjs');
+const mod=import('./paq_worker.mjs');
 const divs=[...document.querySelectorAll('main>div')];
 divs[0].textContent='Fetching data...';
 const original=new Uint8Array(await(await fetch('./paq.wasm')).arrayBuffer());

@@ -41,7 +41,7 @@ main.busy::before{
 <main></main>
 </body>
 <script type="module">
-const {paq}=await import('./paq.mjs');
+const {paq}=await import('./paq_worker.mjs');
 const main=document.querySelector('main');
 main.classList.add('ready');
 ['dragenter','dragover','dragleave','drop'].forEach(it=>{
